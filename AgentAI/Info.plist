@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>AI Agent needs access to your calendar to schedule and manage events</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>AI Agent needs access to your reminders for task management</string>
+	<key>NSContactsUsageDescription</key>
+	<string>AI Agent needs access to your contacts for communication tasks</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>AI Agent uses your location to provide context-aware assistance</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>AI Agent needs microphone access for voice commands</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>AI Agent uses speech recognition to understand voice commands</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>AI Agent sends notifications for task reminders and updates</string>
+</dict>
+</plist>
