@@ -43,13 +43,13 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            
+
             // Check if auto-merge is already enabled
             if (pr.auto_merge) {
               console.log('Auto-merge is already enabled');
               return;
             }
-            
+
             try {
               await github.rest.pulls.enableAutoMerge({
                 owner: context.repo.owner,
@@ -64,7 +64,9 @@ jobs:
             }
 
       - name: Disable auto-merge
-        if: steps.check-label.outputs.result == 'false' && github.event.pull_request.auto_merge
+        if: |
+          steps.check-label.outputs.result == 'false' &&
+          github.event.pull_request.auto_merge
         uses: actions/github-script@v7
         with:
           script: |
