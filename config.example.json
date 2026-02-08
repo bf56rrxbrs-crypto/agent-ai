@@ -1,0 +1,59 @@
+"""
+Example configuration file for the Autonomous AI Agent.
+
+Copy this file and customize it for your environment.
+"""
+
+{
+  "agent": {
+    "agent_id": "production-agent-001",
+    "name": "Production Autonomous Agent",
+    "log_level": "INFO",
+    "max_concurrent_tasks": 10,
+    "health_check_interval": 30,
+    "task_timeout": 600,
+    "enable_auto_recovery": true
+  },
+  "cache": {
+    "enabled": true,
+    "max_size": 5000,
+    "ttl_seconds": 3600,
+    "strategy": "lru"
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics_interval": 60,
+    "log_rotation": true,
+    "max_log_size_mb": 100
+  },
+  "integrations": {
+    "enabled": ["api-001", "webhook-001"],
+    "configs": {
+      "api-001": {
+        "integration_id": "api-001",
+        "name": "Main API",
+        "enabled": true,
+        "config": {
+          "base_url": "https://api.example.com",
+          "api_key": "your-api-key-here",
+          "headers": {
+            "Content-Type": "application/json"
+          }
+        },
+        "retry_policy": {
+          "max_retries": 3,
+          "backoff_factor": 2
+        }
+      },
+      "webhook-001": {
+        "integration_id": "webhook-001",
+        "name": "Notification Webhook",
+        "enabled": true,
+        "config": {
+          "webhook_url": "https://hooks.example.com/notify",
+          "secret": "your-webhook-secret"
+        }
+      }
+    }
+  }
+}

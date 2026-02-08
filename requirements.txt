@@ -1,0 +1,20 @@
+# Requirements for Autonomous AI Agent
+
+# No external dependencies required!
+# The framework uses only Python standard library (3.7+)
+
+# Optional dependencies for enhanced functionality:
+
+# For advanced async operations
+# aiohttp>=3.8.0
+
+# For enhanced logging
+# python-json-logger>=2.0.0
+
+# For metrics and monitoring
+# prometheus-client>=0.14.0
+
+# For testing
+# pytest>=7.0.0
+# pytest-asyncio>=0.18.0
+# pytest-cov>=3.0.0
