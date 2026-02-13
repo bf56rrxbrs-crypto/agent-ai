@@ -1,7 +1,8 @@
 """
 Main entry point for the Autonomous AI Agent.
 
-This module demonstrates the usage of all autonomous features and integrations.
+This module demonstrates the usage of all autonomous features and integrations,
+including advanced AI capabilities.
 """
 
 import asyncio
@@ -17,6 +18,17 @@ from integration_manager import (
 )
 from config_manager import ConfigManager
 from cache_manager import CacheManager
+
+# Import advanced features
+from personality_manager import PersonalityManager, PersonalityTrait
+from intent_recognizer import IntentRecognizer
+from context_manager import ContextManager
+from creative_writer import CreativeWriter, WritingTone, ContentType
+from multimodal_handler import MultimodalHandler, ImageStyle
+from learning_system import LearningSystem, FeedbackType, PerformanceMetric
+from collaboration_integrations import CollaborationManager, CollaborationPlatform, MessagePriority
+from emotion_analyzer import EmotionAnalyzer, Emotion
+from security_manager import SecurityManager, DataClassification
 
 
 # Setup logging
@@ -216,13 +228,170 @@ async def main():
     print(f"    - Size: {cache_stats['size']}/{cache_stats['max_size']}")
     print(f"    - Hit Rate: {cache_stats['hit_rate']:.2%}")
     
-    # 10. Graceful shutdown
-    print("\n10. Shutting down agent...")
+    # 10. Advanced Features Demo
+    print("\n10. Advanced AI Features Demo...")
+    
+    # Personality Manager
+    print("\n  10.1 Personality Manager:")
+    personality_mgr = PersonalityManager()
+    personality_mgr.set_active_profile("empathetic-001")
+    profile = personality_mgr.get_active_profile()
+    print(f"    ✓ Active profile: {profile.name}")
+    
+    response = personality_mgr.adjust_response("Here is your answer.")
+    print(f"    ✓ Adjusted response: {response}")
+    
+    # Intent Recognition
+    print("\n  10.2 Intent Recognition:")
+    intent_recognizer = IntentRecognizer()
+    intent = intent_recognizer.recognize("What is the weather today?")
+    print(f"    ✓ Recognized intent: {intent.intent_type.value} (confidence: {intent.confidence:.2f})")
+    
+    # Context Management
+    print("\n  10.3 Context Management:")
+    context_mgr = ContextManager()
+    context = context_mgr.create_context("demo-ctx-001", user_id="demo-user")
+    context_mgr.update_context("demo-ctx-001", "Hello", "Hi there!", intent="greeting")
+    summary = context_mgr.get_context_summary("demo-ctx-001")
+    print(f"    ✓ Context created with {summary['turn_count']} turn(s)")
+    
+    # Creative Writer
+    print("\n  10.4 Creative Writing:")
+    writer = CreativeWriter()
+    content = writer.generate_content("email-professional", {
+        "recipient": "Team",
+        "purpose": "share updates",
+        "body": "The project is progressing well.",
+        "sender": "AI Agent"
+    })
+    print(f"    ✓ Generated email ({len(content)} chars)")
+    
+    # A/B Testing
+    variants = ["Version A: Great product!", "Version B: Amazing solution!"]
+    ab_test = writer.create_ab_test("test-001", variants)
+    print(f"    ✓ Created A/B test with {ab_test['variant_count']} variants")
+    
+    # Multimodal Handler
+    print("\n  10.5 Multimodal Capabilities:")
+    mm_handler = MultimodalHandler()
+    mm_handler.enable_voice_commands()
+    voice_cmd = mm_handler.process_voice_command(None, "Create a new task")
+    print(f"    ✓ Processed voice command: {voice_cmd.command_type.value}")
+    
+    img_request = mm_handler.generate_image("A futuristic AI assistant", ImageStyle.ARTISTIC)
+    print(f"    ✓ Image generation request: {img_request['request_id']}")
+    
+    # Learning System
+    print("\n  10.6 Learning System:")
+    learning_sys = LearningSystem()
+    learning_sys.record_feedback(FeedbackType.POSITIVE, rating=4.5, comment="Excellent!")
+    learning_sys.record_feedback(FeedbackType.POSITIVE, rating=5.0, comment="Perfect!")
+    feedback_summary = learning_sys.get_feedback_summary()
+    print(f"    ✓ Recorded {feedback_summary['total']} feedback entries")
+    print(f"    ✓ Average rating: {feedback_summary['average_rating']:.1f}/5.0")
+    
+    # Collaboration Integrations
+    print("\n  10.7 Collaboration Integrations:")
+    collab_mgr = CollaborationManager()
+    await collab_mgr.add_integration(CollaborationPlatform.SLACK, {"workspace": "demo"})
+    msg_id = await collab_mgr.send_message(
+        CollaborationPlatform.SLACK,
+        "general",
+        "AI Agent is now online!",
+        MessagePriority.NORMAL
+    )
+    print(f"    ✓ Sent message to Slack: {msg_id}")
+    
+    # Emotion Analysis
+    print("\n  10.8 Emotion Analysis:")
+    emotion_analyzer = EmotionAnalyzer()
+    analysis = emotion_analyzer.analyze_emotion("I am so happy and excited about this!")
+    print(f"    ✓ Detected emotion: {analysis.primary_emotion.value}")
+    print(f"    ✓ Sentiment: {analysis.sentiment.value} (score: {analysis.sentiment_score:.2f})")
+    
+    modified_response = emotion_analyzer.modify_response_for_emotion(
+        "Here is your result.",
+        analysis.primary_emotion
+    )
+    print(f"    ✓ Modified response: {modified_response}")
+    
+    # Security Manager
+    print("\n  10.9 Security & Privacy:")
+    security_mgr = SecurityManager()
+    
+    # Encrypt data
+    encrypted = security_mgr.encrypt_data("Confidential information")
+    print(f"    ✓ Encrypted data with key: {encrypted['key_id']}")
+    
+    # Register data asset
+    asset = security_mgr.register_data_asset(
+        "demo-asset-001",
+        DataClassification.CONFIDENTIAL,
+        encrypted=True,
+        owner="demo-user"
+    )
+    print(f"    ✓ Registered data asset: {asset.asset_id}")
+    
+    # Check GDPR compliance
+    compliance = security_mgr.check_gdpr_compliance("demo-asset-001")
+    print(f"    ✓ GDPR compliance: {'✓ Compliant' if compliance['compliant'] else '✗ Non-compliant'}")
+    
+    # Privacy report
+    privacy_report = security_mgr.generate_privacy_report()
+    print(f"    ✓ Privacy report: {privacy_report['total_assets']} assets, "
+          f"{privacy_report['encryption_rate']:.0%} encrypted")
+    
+    # 11. Display comprehensive statistics
+    print("\n11. Advanced Features Statistics:")
+    print(f"  Personality Manager:")
+    print(f"    - Profiles: {len(personality_mgr.profiles)}")
+    print(f"    - Interactions: {len(personality_mgr.interaction_history)}")
+    
+    print(f"  Intent Recognizer:")
+    intent_stats = intent_recognizer.get_stats()
+    print(f"    - Total recognitions: {intent_stats['total_recognitions']}")
+    
+    print(f"  Context Manager:")
+    context_stats = context_mgr.get_stats()
+    print(f"    - Active contexts: {context_stats['active_contexts']}")
+    print(f"    - Total turns: {context_stats['total_turns']}")
+    
+    print(f"  Learning System:")
+    learning_stats = learning_sys.get_stats()
+    print(f"    - Total feedback: {learning_stats['total_feedback']}")
+    print(f"    - Recommendations: {learning_stats['recommendations_count']}")
+    
+    print(f"  Collaboration Manager:")
+    collab_stats = collab_mgr.get_stats()
+    print(f"    - Active integrations: {collab_stats['active_integrations']}")
+    print(f"    - Total messages: {collab_stats['total_messages']}")
+    
+    print(f"  Emotion Analyzer:")
+    emotion_stats = emotion_analyzer.get_stats()
+    print(f"    - Total analyses: {emotion_stats['total_analyses']}")
+    
+    print(f"  Security Manager:")
+    security_stats = security_mgr.get_stats()
+    print(f"    - Total assets: {security_stats['total_assets']}")
+    print(f"    - Encrypted assets: {security_stats['encrypted_assets']}")
+    
+    # 12. Graceful shutdown
+    print("\n12. Shutting down agent...")
     await agent.stop()
     print("✓ Agent stopped gracefully")
     
     print("\n" + "=" * 60)
-    print("Demo completed successfully!")
+    print("🎉 Complete Demo with Advanced Features Finished!")
+    print("=" * 60)
+    print("\nAll 8 advanced AI features demonstrated:")
+    print("  1. ✓ Personality & Behavior Customization")
+    print("  2. ✓ Intent Recognition & Context Awareness")
+    print("  3. ✓ Creative Writing & Personalization")
+    print("  4. ✓ Multimodal Capabilities (Voice & Image)")
+    print("  5. ✓ Auto-Improving Learning System")
+    print("  6. ✓ Real-Time Collaboration Integrations")
+    print("  7. ✓ Emotional Intelligence")
+    print("  8. ✓ Data-Sensitive Operations & Security")
     print("=" * 60)
 
 
