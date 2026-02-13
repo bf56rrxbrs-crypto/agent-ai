@@ -8,6 +8,8 @@ import logging
 import hashlib
 import secrets
 import json
+import random
+import math
 from typing import Dict, List, Optional, Any
 from enum import Enum
 from dataclasses import dataclass
@@ -339,20 +341,26 @@ class SecurityManager:
         Returns:
             Data with added noise for privacy protection
         """
-        import random
-        
         # Calculate Laplace noise scale
         scale = sensitivity / epsilon
         
         # Add Laplace noise to each data point
         noisy_data = []
         for value in data:
-            # Laplace noise: sample from Laplace distribution
-            noise = random.random()
-            if random.random() < 0.5:
-                noise = -noise
-            laplace_noise = -scale * (1 if noise >= 0 else -1) * \
-                           (1 - abs(noise)) ** (1/scale) if scale > 0 else 0
+            # Laplace noise: sample from Laplace distribution using inverse transform
+            # U ~ Uniform(0, 1), then noise = -scale * sign(U - 0.5) * log(1 - 2|U - 0.5|)
+            uniform = random.random()
+            
+            # Determine sign
+            if uniform < 0.5:
+                sign = 1
+                uniform_shifted = 0.5 - uniform
+            else:
+                sign = -1
+                uniform_shifted = uniform - 0.5
+            
+            # Generate Laplace noise using inverse CDF
+            laplace_noise = -scale * sign * math.log(1 - 2 * uniform_shifted)
             
             noisy_value = value + laplace_noise
             noisy_data.append(noisy_value)

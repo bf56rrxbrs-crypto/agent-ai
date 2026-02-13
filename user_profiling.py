@@ -85,6 +85,9 @@ class UserProfilingSystem:
     - Adaptive personalization
     """
     
+    # Class constants for customization
+    GREETING_WORDS = ["hi", "hello", "hey", "greetings"]
+    
     def __init__(self, storage_path: Optional[str] = None):
         self.logger = logging.getLogger("UserProfilingSystem")
         self.logger.setLevel(logging.INFO)
@@ -188,10 +191,13 @@ class UserProfilingSystem:
             # Keep only last 100 mood entries
             profile.behavior.mood_history = profile.behavior.mood_history[-100:]
         
-        # Track interaction time (hour of day)
+        # Track interaction time (hour of day) - keep unique hours only
         hour = datetime.now().hour
-        if hour not in profile.behavior.preferred_interaction_times:
-            profile.behavior.preferred_interaction_times.append(hour)
+        # Convert to set for O(1) lookup, then back to list
+        interaction_hours = set(profile.behavior.preferred_interaction_times)
+        if hour not in interaction_hours:
+            interaction_hours.add(hour)
+            profile.behavior.preferred_interaction_times = sorted(list(interaction_hours))
         
         profile.last_updated = datetime.now()
         self._save_profiles()
@@ -246,7 +252,7 @@ class UserProfilingSystem:
         if profile.preferences.preferred_tone == "friendly":
             # Check for greeting words as whole words, not substrings
             words = modified.lower().split()
-            has_greeting = any(word.strip('.,!?') in ["hi", "hello", "hey"] for word in words)
+            has_greeting = any(word.strip('.,!?') in self.GREETING_WORDS for word in words)
             if not has_greeting:
                 prefix = "Hey! "
         
