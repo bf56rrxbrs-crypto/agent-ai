@@ -4,7 +4,7 @@ Unit tests for all advanced features modules
 
 import unittest
 import asyncio
-from multimodal_handler import MultimodalHandler, VoiceCommandType, ImageStyle
+from multimodal_handler import MultimodalHandler, VoiceCommandType, ImageStyle, TTSVoice, AudioFormat
 from learning_system import LearningSystem, FeedbackType, PerformanceMetric
 from emotion_analyzer import EmotionAnalyzer, Emotion, Sentiment
 from security_manager import SecurityManager, DataClassification, EncryptionAlgorithm
@@ -32,13 +32,45 @@ class TestMultimodalHandler(unittest.TestCase):
         self.assertIn("request_id", result)
         self.assertEqual(result["status"], "pending")
     
+    def test_tts_functionality(self):
+        """Test text-to-speech"""
+        self.handler.enable_tts()
+        self.assertTrue(self.handler.tts_enabled)
+        
+        result = self.handler.text_to_speech(
+            "Hello, this is a test",
+            voice=TTSVoice.FEMALE_NEUTRAL,
+            audio_format=AudioFormat.MP3
+        )
+        
+        self.assertIn("request_id", result)
+        self.assertIn("audio_url", result)
+        self.assertEqual(result["status"], "completed")
+    
+    def test_tts_disabled(self):
+        """Test TTS when disabled"""
+        result = self.handler.text_to_speech("Test")
+        self.assertIn("error", result)
+    
+    def test_speech_to_text_stub(self):
+        """Test speech-to-text stub"""
+        result = self.handler.speech_to_text_api_example("audio.wav")
+        
+        self.assertIn("transcription", result)
+        self.assertIn("confidence", result)
+    
     def test_get_stats(self):
         """Test getting statistics"""
+        self.handler.enable_tts()
         self.handler.process_voice_command(None, "Hello")
+        self.handler.text_to_speech("Test")
+        
         stats = self.handler.get_stats()
         
         self.assertIn("total_voice_commands", stats)
+        self.assertIn("total_tts_requests", stats)
         self.assertGreater(stats["total_voice_commands"], 0)
+        self.assertGreater(stats["total_tts_requests"], 0)
 
 
 class TestLearningSystem(unittest.TestCase):
@@ -216,6 +248,58 @@ class TestSecurityManager(unittest.TestCase):
         self.assertNotEqual(anonymized["name"], "John Doe")
         self.assertNotEqual(anonymized["email"], "john@example.com")
         self.assertEqual(anonymized["age"], 30)  # Non-PII unchanged
+    
+    def test_differential_privacy(self):
+        """Test differential privacy mechanism"""
+        data = [10.0, 20.0, 30.0, 40.0, 50.0]
+        
+        # Apply differential privacy
+        noisy_data = self.manager.apply_differential_privacy(
+            data,
+            epsilon=1.0,
+            sensitivity=1.0
+        )
+        
+        # Check that we got back the same number of values
+        self.assertEqual(len(noisy_data), len(data))
+        
+        # Values should be different due to noise
+        # (there's a tiny chance they could be the same, but very unlikely)
+        differences = sum(1 for i in range(len(data)) if noisy_data[i] != data[i])
+        self.assertGreater(differences, 0)
+    
+    def test_aggregate_with_privacy(self):
+        """Test aggregation with differential privacy"""
+        data = [100.0, 200.0, 300.0, 400.0, 500.0]
+        
+        # Test mean aggregation
+        noisy_mean = self.manager.aggregate_with_privacy(data, "mean", epsilon=1.0)
+        self.assertIsInstance(noisy_mean, float)
+        
+        # Test sum aggregation
+        noisy_sum = self.manager.aggregate_with_privacy(data, "sum", epsilon=1.0)
+        self.assertIsInstance(noisy_sum, float)
+        
+        # Test count aggregation
+        noisy_count = self.manager.aggregate_with_privacy(data, "count", epsilon=1.0)
+        self.assertIsInstance(noisy_count, float)
+    
+    def test_ccpa_compliance(self):
+        """Test CCPA compliance check"""
+        # Register asset
+        self.manager.register_data_asset(
+            "asset-ccpa-001",
+            DataClassification.CONFIDENTIAL,
+            encrypted=True,
+            owner="data-manager",
+            retention_days=365
+        )
+        
+        compliance = self.manager.check_ccpa_compliance("asset-ccpa-001")
+        
+        self.assertIn("regulation", compliance)
+        self.assertEqual(compliance["regulation"], "CCPA")
+        self.assertTrue(compliance["compliant"])
     
     def test_privacy_report(self):
         """Test generating privacy report"""

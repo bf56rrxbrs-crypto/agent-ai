@@ -48,3 +48,8 @@ htmlcov/
 # Temporary files
 tmp/
 *.tmp
+
+# User profile storage
+*_user_profiles.json
+user_profiles.json
+demo_user_profiles.json

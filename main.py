@@ -24,11 +24,12 @@ from personality_manager import PersonalityManager, PersonalityTrait
 from intent_recognizer import IntentRecognizer
 from context_manager import ContextManager
 from creative_writer import CreativeWriter, WritingTone, ContentType
-from multimodal_handler import MultimodalHandler, ImageStyle
+from multimodal_handler import MultimodalHandler, ImageStyle, TTSVoice, AudioFormat
 from learning_system import LearningSystem, FeedbackType, PerformanceMetric
 from collaboration_integrations import CollaborationManager, CollaborationPlatform, MessagePriority
 from emotion_analyzer import EmotionAnalyzer, Emotion
 from security_manager import SecurityManager, DataClassification
+from user_profiling import UserProfilingSystem, UserMoodState
 
 
 # Setup logging
@@ -281,6 +282,15 @@ async def main():
     img_request = mm_handler.generate_image("A futuristic AI assistant", ImageStyle.ARTISTIC)
     print(f"    ✓ Image generation request: {img_request['request_id']}")
     
+    # Text-to-Speech
+    mm_handler.enable_tts()
+    tts_result = mm_handler.text_to_speech(
+        "Welcome to the AI assistant demo!",
+        voice=TTSVoice.FEMALE_NEUTRAL,
+        audio_format=AudioFormat.MP3
+    )
+    print(f"    ✓ TTS generated: {tts_result['request_id']} ({tts_result['estimated_duration']:.1f}s)")
+    
     # Learning System
     print("\n  10.6 Learning System:")
     learning_sys = LearningSystem()
@@ -336,10 +346,57 @@ async def main():
     compliance = security_mgr.check_gdpr_compliance("demo-asset-001")
     print(f"    ✓ GDPR compliance: {'✓ Compliant' if compliance['compliant'] else '✗ Non-compliant'}")
     
+    # Check CCPA compliance
+    ccpa_compliance = security_mgr.check_ccpa_compliance("demo-asset-001")
+    print(f"    ✓ CCPA compliance: {'✓ Compliant' if ccpa_compliance['compliant'] else '✗ Non-compliant'}")
+    
+    # Differential privacy
+    sensitive_data = [100.0, 200.0, 150.0, 175.0, 225.0]
+    private_mean = security_mgr.aggregate_with_privacy(sensitive_data, "mean", epsilon=1.0)
+    print(f"    ✓ Private mean (ε=1.0): {private_mean:.2f} (actual: {sum(sensitive_data)/len(sensitive_data):.2f})")
+    
     # Privacy report
     privacy_report = security_mgr.generate_privacy_report()
     print(f"    ✓ Privacy report: {privacy_report['total_assets']} assets, "
           f"{privacy_report['encryption_rate']:.0%} encrypted")
+    
+    # User Profiling System
+    print("\n  10.10 User Profiling & Adaptive Personalization:")
+    user_profiling = UserProfilingSystem(storage_path="demo_user_profiles.json")
+    
+    # Create user profile
+    user_profile = user_profiling.create_profile("user-demo-001", name="Demo User")
+    user_profiling.update_preferences("user-demo-001", {
+        "preferred_tone": "friendly",
+        "response_length": "medium"
+    })
+    print(f"    ✓ Created user profile: {user_profile.name}")
+    
+    # Track interactions
+    user_profiling.track_interaction(
+        "user-demo-001",
+        topic="AI features",
+        duration=5.2,
+        detected_mood=UserMoodState.CURIOUS
+    )
+    print(f"    ✓ Tracked interaction with mood detection")
+    
+    # Mood detection
+    mood = user_profiling.detect_mood_from_text("I need help with this urgent issue!")
+    print(f"    ✓ Detected mood from text: {mood.value}")
+    
+    # Adaptive response
+    original_response = "Here are the features you requested."
+    adapted_response = user_profiling.adapt_response_to_user(
+        "user-demo-001",
+        original_response,
+        current_mood=UserMoodState.HAPPY
+    )
+    print(f"    ✓ Adapted response: {adapted_response}")
+    
+    # User insights
+    insights = user_profiling.get_user_insights("user-demo-001")
+    print(f"    ✓ User insights: {insights['total_interactions']} interactions")
     
     # 11. Display comprehensive statistics
     print("\n11. Advanced Features Statistics:")
@@ -375,6 +432,11 @@ async def main():
     print(f"    - Total assets: {security_stats['total_assets']}")
     print(f"    - Encrypted assets: {security_stats['encrypted_assets']}")
     
+    print(f"  User Profiling:")
+    profiling_stats = user_profiling.get_stats()
+    print(f"    - Total profiles: {profiling_stats['total_profiles']}")
+    print(f"    - Total interactions: {profiling_stats['total_interactions']}")
+    
     # 12. Graceful shutdown
     print("\n12. Shutting down agent...")
     await agent.stop()
@@ -383,15 +445,17 @@ async def main():
     print("\n" + "=" * 60)
     print("🎉 Complete Demo with Advanced Features Finished!")
     print("=" * 60)
-    print("\nAll 8 advanced AI features demonstrated:")
+    print("\nAll 10 advanced AI features demonstrated:")
     print("  1. ✓ Personality & Behavior Customization")
     print("  2. ✓ Intent Recognition & Context Awareness")
     print("  3. ✓ Creative Writing & Personalization")
-    print("  4. ✓ Multimodal Capabilities (Voice & Image)")
+    print("  4. ✓ Multimodal Capabilities (Voice, TTS, & Image)")
     print("  5. ✓ Auto-Improving Learning System")
     print("  6. ✓ Real-Time Collaboration Integrations")
     print("  7. ✓ Emotional Intelligence")
-    print("  8. ✓ Data-Sensitive Operations & Security")
+    print("  8. ✓ Data Security with Differential Privacy")
+    print("  9. ✓ User Profiling & Adaptive Personalization")
+    print(" 10. ✓ GDPR & CCPA Privacy Compliance")
     print("=" * 60)
 
 
