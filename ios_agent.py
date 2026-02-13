@@ -231,11 +231,11 @@ class IOSAgent:
             ),
             DeviceCapability(
                 "apple_intelligence",
-                "On-device AI processing using Apple Intelligence and Neural Engine",
+                "Apple Intelligence features: Writing Tools, Image Playground, smart replies, and notification summaries via A19 Pro Neural Engine",
             ),
             DeviceCapability(
                 "siri_integration",
-                "Voice-activated Siri commands with on-device language understanding",
+                "Siri with on-device speech recognition, App Intents, and personal context awareness",
             ),
             DeviceCapability(
                 "camera_control",
