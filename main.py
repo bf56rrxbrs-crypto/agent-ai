@@ -1,7 +1,9 @@
 """
 Main entry point for the Autonomous AI Agent.
 
-This module demonstrates the usage of all autonomous features and integrations.
+This module demonstrates the usage of all autonomous features and integrations,
+including the iOS Agent with forward-thinking structural loop engineering
+and persistent memory.
 """
 
 import asyncio
@@ -17,6 +19,9 @@ from integration_manager import (
 )
 from config_manager import ConfigManager
 from cache_manager import CacheManager
+from ios_agent import IOSAgent
+from persistent_memory import PersistentMemory
+from forward_thinking_engine import ForwardThinkingEngine
 
 
 # Setup logging
@@ -220,6 +225,85 @@ async def main():
     print("\n10. Shutting down agent...")
     await agent.stop()
     print("✓ Agent stopped gracefully")
+    
+    # ================================================================
+    # 11. iOS Agent Demo - iPhone 17 Pro
+    # ================================================================
+    print("\n" + "=" * 60)
+    print("iOS Agent Assistant - iPhone 17 Pro Demo")
+    print("=" * 60)
+    
+    # Initialize iOS Agent
+    print("\n11. Initializing iOS Agent for iPhone 17 Pro...")
+    ios_agent = IOSAgent(
+        agent_id="iphone17pro-agent",
+        memory_path="/tmp/ios_agent_demo_memory.json",
+    )
+    await ios_agent.start()
+    
+    device = ios_agent.device
+    print(f"✓ iOS Agent started on {device.device_model}")
+    print(f"  - OS: {device.os_version}")
+    print(f"  - Chip: {device.chip}")
+    print(f"  - Neural Engine: {device.neural_engine_cores} cores")
+    print(f"  - Capabilities: {len(ios_agent.capabilities)}")
+    
+    # 12. Persistent Memory Demo
+    print("\n12. Persistent Memory...")
+    ios_agent.remember("User prefers dark mode", importance=0.9)
+    ios_agent.remember("Morning routine: news, weather, calendar", category="user_context", importance=0.8)
+    ios_agent.remember("Preferred language: English", importance=0.7)
+    
+    recall_results = ios_agent.recall("dark mode")
+    print(f"✓ Stored 3 memories, recalled: {recall_results[0]['content']}")
+    
+    memory_summary = ios_agent.memory.get_summary()
+    print(f"  - Total memories: {memory_summary['total_memories']}")
+    print(f"  - Categories: {list(memory_summary['categories'].keys())}")
+    
+    # 13. Forward-Thinking Planning Demo
+    print("\n13. Forward-Thinking Structural Loop Engineering...")
+    
+    result = await ios_agent.execute_instruction(
+        "Check notifications and prioritize important messages",
+        priority=TaskPriority.HIGH,
+        use_planning=True,
+    )
+    print(f"✓ Planned instruction: status={result['status']}")
+    print(f"  - Plan iterations: {result.get('iterations', 'N/A')}")
+    
+    result2 = await ios_agent.execute_instruction(
+        "Optimize battery settings for travel mode",
+        priority=TaskPriority.MEDIUM,
+        use_planning=True,
+    )
+    print(f"✓ Planned instruction: status={result2['status']}")
+    
+    # 14. Device Capabilities Demo
+    print("\n14. iOS Device Capabilities...")
+    
+    cap_result = await ios_agent.use_capability("notification_management")
+    print(f"✓ Notification management: {cap_result['capability']}")
+    
+    cap_result2 = await ios_agent.use_capability("focus_mode_control")
+    print(f"✓ Focus mode control: {cap_result2['capability']}")
+    
+    cap_result3 = await ios_agent.use_capability("device_optimization")
+    print(f"✓ Device optimization: {cap_result3['capability']}")
+    
+    # 15. iOS Agent Status
+    print("\n15. iOS Agent Status:")
+    ios_status = ios_agent.get_status()
+    print(f"  - Device: {ios_status['device']['device_model']}")
+    print(f"  - Reliability: {ios_status['reliability']['rate']:.1%}")
+    print(f"  - Instructions handled: {ios_status['reliability']['total_instructions']}")
+    print(f"  - Memory entries: {ios_status['memory']['total_memories']}")
+    print(f"  - Plans created: {ios_status['planning_engine']['total_plans']}")
+    
+    # 16. Graceful shutdown
+    print("\n16. Shutting down iOS Agent...")
+    await ios_agent.stop()
+    print("✓ iOS Agent stopped gracefully")
     
     print("\n" + "=" * 60)
     print("Demo completed successfully!")

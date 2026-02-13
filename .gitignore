@@ -48,3 +48,6 @@ htmlcov/
 # Temporary files
 tmp/
 *.tmp
+
+# Agent memory storage (generated at runtime)
+agent_memory.json
