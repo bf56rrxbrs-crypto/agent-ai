@@ -145,9 +145,10 @@ class TestCacheManager(unittest.TestCase):
         self.assertEqual(value, "value1")
     
     def test_invalid_strategy(self):
-        """Test invalid strategy raises error"""
-        with self.assertRaises(ValueError):
+        """Test invalid strategy raises error with supported options"""
+        with self.assertRaises(ValueError) as ctx:
             CacheManager(strategy="invalid")
+        self.assertIn("Supported strategies", str(ctx.exception))
     
     def test_get_stats_with_strategy(self):
         """Test getting stats includes strategy"""

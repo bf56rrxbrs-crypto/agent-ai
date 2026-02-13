@@ -52,7 +52,15 @@ class Memory:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Memory":
-        """Create Memory from dictionary"""
+        """Create Memory from dictionary.
+
+        Raises:
+            ValueError: If required fields are missing or data is invalid.
+        """
+        required_fields = {"memory_id", "category", "content"}
+        missing = required_fields - set(data.keys())
+        if missing:
+            raise ValueError(f"Missing required memory fields: {missing}")
         return cls(**data)
 
 
@@ -292,7 +300,10 @@ class PersistentMemory:
             self._save_to_disk()
 
     def _save_to_disk(self):
-        """Save memories to JSON file"""
+        """Save memories to JSON file.
+
+        Logs errors but does not raise to avoid interrupting agent operations.
+        """
         try:
             Path(self.storage_path).parent.mkdir(parents=True, exist_ok=True)
 
@@ -304,14 +315,19 @@ class PersistentMemory:
                 },
             }
 
-            with open(self.storage_path, "w") as f:
+            tmp_path = self.storage_path + ".tmp"
+            with open(tmp_path, "w") as f:
                 json.dump(data, f, indent=2)
+            os.replace(tmp_path, self.storage_path)
 
         except Exception as e:
             self.logger.error(f"Failed to save memories: {e}")
 
     def _load_from_disk(self):
-        """Load memories from JSON file"""
+        """Load memories from JSON file.
+
+        Logs errors and falls back to empty state if file is corrupted.
+        """
         if not os.path.exists(self.storage_path):
             return
 
@@ -319,12 +335,21 @@ class PersistentMemory:
             with open(self.storage_path, "r") as f:
                 data = json.load(f)
 
+            if not isinstance(data, dict):
+                self.logger.error("Invalid memory file format: expected a JSON object")
+                return
+
             self._memory_counter = data.get("memory_counter", 0)
 
             for mid, mem_data in data.get("memories", {}).items():
-                self.memories[mid] = Memory.from_dict(mem_data)
+                try:
+                    self.memories[mid] = Memory.from_dict(mem_data)
+                except (ValueError, TypeError) as e:
+                    self.logger.warning(f"Skipping corrupted memory entry '{mid}': {e}")
 
             self.logger.info(f"Loaded {len(self.memories)} memories from disk")
 
+        except json.JSONDecodeError as e:
+            self.logger.error(f"Corrupted memory file (invalid JSON): {e}")
         except Exception as e:
             self.logger.error(f"Failed to load memories: {e}")

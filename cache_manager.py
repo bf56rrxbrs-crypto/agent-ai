@@ -191,7 +191,9 @@ class CacheManager:
         elif strategy == "lfu":
             self.cache = LFUCache(max_size, default_ttl)
         else:
-            raise ValueError(f"Unknown cache strategy: {strategy}")
+            raise ValueError(
+                f"Unknown cache strategy: {strategy}. Supported strategies: 'lru', 'lfu'"
+            )
     
     def get(self, key: str) -> Optional[Any]:
         """Get value from cache"""

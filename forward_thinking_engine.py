@@ -219,6 +219,13 @@ class ForwardThinkingEngine:
             raise ValueError(f"Plan not found: {plan_id}")
 
         plan = self.plans[plan_id]
+
+        if not plan.steps:
+            self.logger.warning(f"Plan {plan_id} has no steps")
+            plan.status = PlanStatus.COMPLETED
+            plan.completed_at = datetime.now().isoformat()
+            return self._get_plan_result(plan)
+
         plan.status = PlanStatus.ACTIVE
 
         self.logger.info(f"Executing plan: {plan_id} - {plan.goal}")
@@ -326,7 +333,7 @@ class ForwardThinkingEngine:
             self.logger.info(f"Step {step.step_id} completed")
 
         except Exception as e:
-            step.error = str(e)
+            step.error = f"{type(e).__name__}: {e}"
             step.retry_count += 1
 
             if step.retry_count <= step.max_retries:
@@ -346,6 +353,20 @@ class ForwardThinkingEngine:
     def _evaluate_plan(self, plan: ExecutionPlan) -> Dict[str, Any]:
         """Evaluate the current state of plan execution"""
         total = len(plan.steps)
+
+        if total == 0:
+            return {
+                "total_steps": 0,
+                "completed": 0,
+                "failed": 0,
+                "pending": 0,
+                "progress": 0.0,
+                "all_completed": False,
+                "has_failures": False,
+                "can_continue": False,
+                "needs_replanning": False,
+            }
+
         completed = sum(1 for s in plan.steps if s.status == StepStatus.COMPLETED)
         failed = sum(1 for s in plan.steps if s.status == StepStatus.FAILED)
         pending = sum(1 for s in plan.steps if s.status == StepStatus.PENDING)
