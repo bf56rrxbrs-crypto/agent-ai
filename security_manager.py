@@ -443,7 +443,11 @@ class SecurityManager:
                 issues.append("Personal information should be encrypted")
         
         # Check data retention
-        if asset.retention_days > 730:  # 2 years - reasonable for most data
+        # Note: CCPA doesn't specify universal retention limits but requires
+        # businesses to disclose retention periods and honor deletion requests.
+        # 730 days (2 years) is used as a reasonable threshold that balances
+        # business needs with privacy best practices. Adjust based on your data type.
+        if asset.retention_days > 730:
             issues.append("Consider shorter retention period for personal information")
         
         # Check if asset has clear ownership (for data access requests)

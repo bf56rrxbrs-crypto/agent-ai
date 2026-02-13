@@ -5,6 +5,7 @@ This module provides interfaces for voice commands and image generation.
 """
 
 import logging
+import uuid
 from typing import Dict, List, Optional, Any
 from enum import Enum
 from dataclasses import dataclass
@@ -134,7 +135,7 @@ class MultimodalHandler:
             transcription: Pre-transcribed text
             command_id: Optional command identifier
         """
-        import uuid
+
         
         if not command_id:
             command_id = f"voice-cmd-{uuid.uuid4().hex[:8]}"
@@ -211,7 +212,7 @@ class MultimodalHandler:
             dimensions: Image dimensions (width, height)
             quality: Quality level
         """
-        import uuid
+
         
         request_id = f"img-{uuid.uuid4().hex[:8]}"
         
@@ -322,7 +323,7 @@ class MultimodalHandler:
         Returns:
             Dictionary with request ID and audio information
         """
-        import uuid
+
         
         if not self.tts_enabled:
             self.logger.warning("TTS requested but not enabled")

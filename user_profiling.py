@@ -7,6 +7,7 @@ preferences storage, and adaptive personalization based on interaction history.
 
 import logging
 import json
+import string
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field, asdict
@@ -252,7 +253,7 @@ class UserProfilingSystem:
         if profile.preferences.preferred_tone == "friendly":
             # Check for greeting words as whole words, not substrings
             words = modified.lower().split()
-            has_greeting = any(word.strip('.,!?') in self.GREETING_WORDS for word in words)
+            has_greeting = any(word.strip(string.punctuation) in self.GREETING_WORDS for word in words)
             if not has_greeting:
                 prefix = "Hey! "
         
