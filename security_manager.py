@@ -319,6 +319,140 @@ class SecurityManager:
         
         return anonymized
     
+    def apply_differential_privacy(
+        self,
+        data: List[float],
+        epsilon: float = 1.0,
+        sensitivity: float = 1.0
+    ) -> List[float]:
+        """
+        Apply differential privacy using Laplace mechanism.
+        
+        Differential privacy protects individual data points by adding
+        calibrated noise to query results or aggregated data.
+        
+        Args:
+            data: Original data values
+            epsilon: Privacy budget (lower = more privacy, more noise)
+            sensitivity: Query sensitivity (max change from one record)
+            
+        Returns:
+            Data with added noise for privacy protection
+        """
+        import random
+        
+        # Calculate Laplace noise scale
+        scale = sensitivity / epsilon
+        
+        # Add Laplace noise to each data point
+        noisy_data = []
+        for value in data:
+            # Laplace noise: sample from Laplace distribution
+            noise = random.random()
+            if random.random() < 0.5:
+                noise = -noise
+            laplace_noise = -scale * (1 if noise >= 0 else -1) * \
+                           (1 - abs(noise)) ** (1/scale) if scale > 0 else 0
+            
+            noisy_value = value + laplace_noise
+            noisy_data.append(noisy_value)
+        
+        self._log_audit(
+            action="apply_differential_privacy",
+            success=True,
+            details={
+                "epsilon": epsilon,
+                "sensitivity": sensitivity,
+                "data_points": len(data)
+            }
+        )
+        
+        self.logger.info(f"Applied differential privacy (ε={epsilon}) to {len(data)} data points")
+        
+        return noisy_data
+    
+    def aggregate_with_privacy(
+        self,
+        data: List[float],
+        aggregation_type: str = "mean",
+        epsilon: float = 1.0
+    ) -> float:
+        """
+        Perform aggregation with differential privacy.
+        
+        Args:
+            data: Data to aggregate
+            aggregation_type: Type of aggregation (mean, sum, count)
+            epsilon: Privacy budget
+            
+        Returns:
+            Aggregated value with privacy protection
+        """
+        if not data:
+            return 0.0
+        
+        if aggregation_type == "mean":
+            true_value = sum(data) / len(data)
+            sensitivity = (max(data) - min(data)) / len(data) if len(data) > 1 else 1.0
+        elif aggregation_type == "sum":
+            true_value = sum(data)
+            sensitivity = max(abs(min(data)), abs(max(data)))
+        elif aggregation_type == "count":
+            true_value = len(data)
+            sensitivity = 1.0
+        else:
+            raise ValueError(f"Unsupported aggregation type: {aggregation_type}")
+        
+        # Apply differential privacy
+        noisy_result = self.apply_differential_privacy([true_value], epsilon, sensitivity)[0]
+        
+        self.logger.debug(f"Aggregated {len(data)} values with privacy: {aggregation_type}")
+        
+        return noisy_result
+    
+    def check_ccpa_compliance(self, asset_id: str) -> Dict[str, Any]:
+        """
+        Check CCPA (California Consumer Privacy Act) compliance.
+        
+        CCPA requires:
+        - Right to know what data is collected
+        - Right to delete personal information
+        - Right to opt-out of data sale
+        - Data security requirements
+        """
+        if asset_id not in self.data_assets:
+            return {
+                "compliant": False,
+                "issues": ["Asset not registered"]
+            }
+        
+        asset = self.data_assets[asset_id]
+        issues = []
+        
+        # Check if personal information is protected
+        if asset.classification in [DataClassification.CONFIDENTIAL, DataClassification.RESTRICTED]:
+            if not asset.encrypted:
+                issues.append("Personal information should be encrypted")
+        
+        # Check data retention
+        if asset.retention_days > 730:  # 2 years - reasonable for most data
+            issues.append("Consider shorter retention period for personal information")
+        
+        # Check if asset has clear ownership (for data access requests)
+        if not asset.owner:
+            issues.append("Asset should have assigned owner for handling consumer requests")
+        
+        compliant = len(issues) == 0
+        
+        return {
+            "regulation": "CCPA",
+            "asset_id": asset_id,
+            "compliant": compliant,
+            "issues": issues,
+            "classification": asset.classification.value,
+            "encrypted": asset.encrypted
+        }
+    
     def generate_privacy_report(self) -> Dict[str, Any]:
         """Generate a privacy compliance report"""
         total_assets = len(self.data_assets)

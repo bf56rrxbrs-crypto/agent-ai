@@ -27,6 +27,23 @@ class ImageStyle(Enum):
     PHOTOGRAPHIC = "photographic"
 
 
+class TTSVoice(Enum):
+    """Text-to-speech voice options"""
+    MALE_NEUTRAL = "male_neutral"
+    FEMALE_NEUTRAL = "female_neutral"
+    MALE_PROFESSIONAL = "male_professional"
+    FEMALE_PROFESSIONAL = "female_professional"
+    CHILD = "child"
+
+
+class AudioFormat(Enum):
+    """Supported audio formats"""
+    MP3 = "mp3"
+    WAV = "wav"
+    OGG = "ogg"
+    FLAC = "flac"
+
+
 @dataclass
 class VoiceCommand:
     """Represents a processed voice command"""
@@ -46,6 +63,17 @@ class ImageGenerationRequest:
     style: ImageStyle
     dimensions: tuple
     quality: str = "standard"
+
+
+@dataclass
+class TTSRequest:
+    """Text-to-speech request"""
+    request_id: str
+    text: str
+    voice: TTSVoice
+    audio_format: AudioFormat
+    speed: float = 1.0
+    pitch: float = 1.0
 
 
 class MultimodalHandler:
@@ -69,6 +97,10 @@ class MultimodalHandler:
         
         # Image generation state
         self.image_requests: Dict[str, ImageGenerationRequest] = {}
+        
+        # TTS state
+        self.tts_enabled = False
+        self.tts_requests: Dict[str, TTSRequest] = {}
         
         self.logger.info("MultimodalHandler initialized")
     
@@ -240,7 +272,9 @@ class MultimodalHandler:
             "voice_enabled": self.voice_enabled,
             "total_voice_commands": len(self.voice_commands),
             "total_image_requests": len(self.image_requests),
-            "voice_command_types": self._get_command_type_distribution()
+            "voice_command_types": self._get_command_type_distribution(),
+            "tts_enabled": self.tts_enabled,
+            "total_tts_requests": len(self.tts_requests)
         }
     
     def _get_command_type_distribution(self) -> Dict[str, int]:
@@ -250,3 +284,125 @@ class MultimodalHandler:
             cmd_type = cmd.command_type.value
             distribution[cmd_type] = distribution.get(cmd_type, 0) + 1
         return distribution
+    
+    def enable_tts(self):
+        """Enable text-to-speech functionality"""
+        self.tts_enabled = True
+        self.logger.info("Text-to-speech enabled")
+    
+    def disable_tts(self):
+        """Disable text-to-speech functionality"""
+        self.tts_enabled = False
+        self.logger.info("Text-to-speech disabled")
+    
+    def text_to_speech(
+        self,
+        text: str,
+        voice: TTSVoice = TTSVoice.FEMALE_NEUTRAL,
+        audio_format: AudioFormat = AudioFormat.MP3,
+        speed: float = 1.0,
+        pitch: float = 1.0
+    ) -> Dict[str, Any]:
+        """
+        Convert text to speech audio.
+        
+        This is a stub for TTS API integration (Google TTS, AWS Polly, Azure TTS).
+        In production, this would:
+        - Send text to TTS service
+        - Receive audio file
+        - Return audio URL or binary data
+        
+        Args:
+            text: Text to convert to speech
+            voice: Voice to use for synthesis
+            audio_format: Output audio format
+            speed: Speech speed (0.5-2.0)
+            pitch: Speech pitch (0.5-2.0)
+            
+        Returns:
+            Dictionary with request ID and audio information
+        """
+        import uuid
+        
+        if not self.tts_enabled:
+            self.logger.warning("TTS requested but not enabled")
+            return {
+                "error": "TTS not enabled",
+                "message": "Call enable_tts() first"
+            }
+        
+        request_id = f"tts-{uuid.uuid4().hex[:8]}"
+        
+        # Validate parameters
+        speed = max(0.5, min(2.0, speed))
+        pitch = max(0.5, min(2.0, pitch))
+        
+        request = TTSRequest(
+            request_id=request_id,
+            text=text,
+            voice=voice,
+            audio_format=audio_format,
+            speed=speed,
+            pitch=pitch
+        )
+        
+        self.tts_requests[request_id] = request
+        
+        # Calculate estimated duration (rough estimate: ~150 words per minute)
+        word_count = len(text.split())
+        duration_seconds = (word_count / 150) * 60 / speed
+        
+        self.logger.info(f"TTS request created: {request_id}")
+        
+        return {
+            "request_id": request_id,
+            "status": "completed",
+            "text_length": len(text),
+            "word_count": word_count,
+            "estimated_duration": duration_seconds,
+            "voice": voice.value,
+            "audio_format": audio_format.value,
+            "audio_url": f"https://example.com/audio/{request_id}.{audio_format.value}",
+            "message": "In production, this would return actual audio file or URL"
+        }
+    
+    def get_tts_status(self, request_id: str) -> Optional[Dict[str, Any]]:
+        """Get status of TTS request"""
+        if request_id not in self.tts_requests:
+            return None
+        
+        request = self.tts_requests[request_id]
+        
+        return {
+            "request_id": request_id,
+            "status": "completed",
+            "text_preview": request.text[:50] + "..." if len(request.text) > 50 else request.text,
+            "voice": request.voice.value,
+            "audio_format": request.audio_format.value
+        }
+    
+    def speech_to_text_api_example(self, audio_file_path: str) -> Dict[str, Any]:
+        """
+        Example stub for speech-to-text API integration.
+        
+        In production, integrate with:
+        - Google Speech-to-Text API
+        - AWS Transcribe
+        - Azure Speech Service
+        - Whisper (OpenAI)
+        
+        Args:
+            audio_file_path: Path to audio file
+            
+        Returns:
+            Transcription result with confidence
+        """
+        self.logger.info(f"STT processing: {audio_file_path}")
+        
+        return {
+            "transcription": "This is a mock transcription from the audio file",
+            "confidence": 0.95,
+            "language": "en-US",
+            "duration_seconds": 5.2,
+            "message": "In production, integrate with actual STT API"
+        }
