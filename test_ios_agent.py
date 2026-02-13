@@ -22,13 +22,19 @@ class TestIOSDeviceProfile(unittest.TestCase):
     """Test cases for IOSDeviceProfile"""
 
     def test_default_profile(self):
-        """Test default device profile"""
+        """Test default iPhone 17 Pro device profile"""
         profile = IOSDeviceProfile()
         self.assertEqual(profile.device_model, "iPhone 17 Pro")
         self.assertEqual(profile.os_version, "iOS 19")
         self.assertEqual(profile.chip, "A19 Pro")
+        self.assertEqual(profile.ram_gb, 12)
+        self.assertEqual(profile.neural_engine_cores, 18)
         self.assertTrue(profile.always_on_display)
         self.assertTrue(profile.dynamic_island)
+        self.assertTrue(profile.apple_intelligence)
+        self.assertTrue(profile.on_device_ai)
+        self.assertTrue(profile.camera_control)
+        self.assertTrue(profile.action_button)
 
     def test_profile_to_dict(self):
         """Test profile serialization"""
@@ -108,7 +114,7 @@ class TestIOSAgent(unittest.TestCase):
         self.assertGreater(len(self.agent.capabilities), 0)
 
     def test_default_capabilities(self):
-        """Test default iOS capabilities are registered"""
+        """Test default iOS capabilities are registered for iPhone 17 Pro"""
         expected_caps = [
             "notification_management",
             "shortcut_automation",
@@ -120,6 +126,12 @@ class TestIOSAgent(unittest.TestCase):
             "media_control",
             "device_optimization",
             "context_awareness",
+            "apple_intelligence",
+            "siri_integration",
+            "camera_control",
+            "action_button_config",
+            "live_activities",
+            "home_automation",
         ]
         for cap_name in expected_caps:
             self.assertIn(cap_name, self.agent.capabilities)

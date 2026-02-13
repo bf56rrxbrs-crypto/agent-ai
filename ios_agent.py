@@ -63,21 +63,33 @@ class DeviceCapability:
 
 @dataclass
 class IOSDeviceProfile:
-    """iPhone 17 Pro device profile"""
+    """iPhone 17 Pro device profile with full hardware/OS awareness"""
     device_model: str = "iPhone 17 Pro"
     os_version: str = "iOS 19"
     chip: str = "A19 Pro"
     ram_gb: int = 12
     neural_engine_cores: int = 18
+    gpu_cores: int = 6
     always_on_display: bool = True
     dynamic_island: bool = True
     action_button: bool = True
     camera_control: bool = True
+    apple_intelligence: bool = True
+    on_device_ai: bool = True
+    promotion_display: bool = True
+    usb_c: bool = True
+    wifi_7: bool = True
+    thread_radio: bool = True
+    satellite_sos: bool = True
     supported_features: List[str] = field(default_factory=lambda: [
-        "siri_integration",
+        "apple_intelligence",
+        "siri_on_device_ai",
+        "siri_app_intents",
         "shortcuts_automation",
         "focus_modes",
         "live_activities",
+        "interactive_widgets",
+        "standby_mode",
         "haptic_feedback",
         "spatial_audio",
         "face_id",
@@ -87,6 +99,12 @@ class IOSDeviceProfile:
         "usb_c",
         "always_on_display",
         "promotion_120hz",
+        "camera_control_button",
+        "action_button",
+        "thread_matter_support",
+        "wifi_7",
+        "crash_detection",
+        "journal_suggestions",
     ])
 
     def to_dict(self) -> Dict[str, Any]:
@@ -97,10 +115,18 @@ class IOSDeviceProfile:
             "chip": self.chip,
             "ram_gb": self.ram_gb,
             "neural_engine_cores": self.neural_engine_cores,
+            "gpu_cores": self.gpu_cores,
             "always_on_display": self.always_on_display,
             "dynamic_island": self.dynamic_island,
             "action_button": self.action_button,
             "camera_control": self.camera_control,
+            "apple_intelligence": self.apple_intelligence,
+            "on_device_ai": self.on_device_ai,
+            "promotion_display": self.promotion_display,
+            "usb_c": self.usb_c,
+            "wifi_7": self.wifi_7,
+            "thread_radio": self.thread_radio,
+            "satellite_sos": self.satellite_sos,
             "supported_features": self.supported_features,
         }
 
@@ -112,7 +138,8 @@ class IOSAgent:
     Combines core autonomous capabilities with iOS-specific features:
     - Forward-thinking structural loop engineering for anticipatory planning
     - Persistent memory for cross-session context and learning
-    - iOS device-aware task execution
+    - iOS device-aware task execution optimized for A19 Pro chip
+    - Apple Intelligence integration for on-device AI processing
     - Adaptive instruction following with reliability tracking
 
     Architecture:
@@ -121,8 +148,8 @@ class IOSAgent:
          ├── ForwardThinkingEngine (plan-execute-evaluate loops)
          ├── PersistentMemory (cross-session storage)
          ├── CacheManager (fast access cache)
-         ├── DeviceCapabilities (iOS-specific features)
-         └── IOSDeviceProfile (hardware/OS awareness)
+         ├── DeviceCapabilities (16 iOS-specific features)
+         └── IOSDeviceProfile (iPhone 17 Pro hardware/OS awareness)
     """
 
     def __init__(
@@ -160,47 +187,71 @@ class IOSAgent:
         )
 
     def _register_default_capabilities(self):
-        """Register default iOS device capabilities"""
+        """Register default iOS device capabilities for iPhone 17 Pro"""
         default_caps = [
             DeviceCapability(
                 "notification_management",
-                "Manage and prioritize iOS notifications intelligently",
+                "Manage and prioritize iOS notifications with intelligent grouping",
             ),
             DeviceCapability(
                 "shortcut_automation",
-                "Create and execute iOS Shortcuts automations",
+                "Create and execute iOS Shortcuts automations via App Intents",
             ),
             DeviceCapability(
                 "focus_mode_control",
-                "Manage Focus modes based on context and schedule",
+                "Manage Focus modes based on context, schedule, and location",
             ),
             DeviceCapability(
                 "app_management",
-                "Launch, switch, and manage iOS applications",
+                "Launch, switch, and manage iOS applications on iPhone 17 Pro",
             ),
             DeviceCapability(
                 "health_monitoring",
-                "Access and analyze health and fitness data",
+                "Access and analyze HealthKit data including crash detection alerts",
             ),
             DeviceCapability(
                 "smart_scheduling",
-                "Intelligent calendar and reminder management",
+                "Intelligent calendar and reminder management with Siri suggestions",
             ),
             DeviceCapability(
                 "communication_handler",
-                "Handle messages, calls, and email intelligently",
+                "Handle iMessages, FaceTime calls, and Mail intelligently",
             ),
             DeviceCapability(
                 "media_control",
-                "Control media playback and spatial audio settings",
+                "Control media playback with spatial audio and AirPlay support",
             ),
             DeviceCapability(
                 "device_optimization",
-                "Optimize battery, storage, and performance",
+                "Optimize battery, storage, and A19 Pro performance settings",
             ),
             DeviceCapability(
                 "context_awareness",
-                "Location, time, and activity context analysis",
+                "Location, time, and activity context via CoreMotion and CoreLocation",
+            ),
+            DeviceCapability(
+                "apple_intelligence",
+                "On-device AI processing using Apple Intelligence and Neural Engine",
+            ),
+            DeviceCapability(
+                "siri_integration",
+                "Voice-activated Siri commands with on-device language understanding",
+            ),
+            DeviceCapability(
+                "camera_control",
+                "Camera Control button actions and ProRAW/ProRes photo management",
+            ),
+            DeviceCapability(
+                "action_button_config",
+                "Configure and automate Action Button shortcuts and triggers",
+            ),
+            DeviceCapability(
+                "live_activities",
+                "Manage Live Activities and Dynamic Island content display",
+            ),
+            DeviceCapability(
+                "home_automation",
+                "Control HomeKit and Matter/Thread smart home devices",
             ),
         ]
 

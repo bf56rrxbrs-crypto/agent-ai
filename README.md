@@ -7,7 +7,8 @@ An intelligent AI agent application for iPhone that utilizes multiple models, to
 ### iOS Agent Assistant (iPhone 17 Pro)
 - **Forward-Thinking Structural Loop Engineering**: Plan-execute-evaluate cycles with adaptive re-planning for anticipatory multi-step reasoning
 - **Persistent Memory**: Cross-session JSON-backed memory with categorized recall, importance scoring, and automatic cleanup
-- **iOS Device Capabilities**: Tailored for iPhone 17 Pro with notification management, Focus modes, Shortcuts automation, health monitoring, and more
+- **iOS Device Capabilities**: 16 capabilities tailored for iPhone 17 Pro including Apple Intelligence, Camera Control, Action Button, Siri integration, Focus modes, Shortcuts automation, Live Activities, HomeKit/Matter, and more
+- **Apple Intelligence & On-Device AI**: Leverages A19 Pro Neural Engine (18 cores) for on-device AI processing
 - **Reliability Tracking**: Instruction-level success tracking for consistent, dependable execution
 
 ### Swift iOS Application

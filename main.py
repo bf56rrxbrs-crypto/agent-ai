@@ -244,9 +244,13 @@ async def main():
     device = ios_agent.device
     print(f"✓ iOS Agent started on {device.device_model}")
     print(f"  - OS: {device.os_version}")
-    print(f"  - Chip: {device.chip}")
+    print(f"  - Chip: {device.chip} ({device.gpu_cores}-core GPU)")
     print(f"  - Neural Engine: {device.neural_engine_cores} cores")
+    print(f"  - Apple Intelligence: {'Enabled' if device.apple_intelligence else 'Disabled'}")
+    print(f"  - On-Device AI: {'Enabled' if device.on_device_ai else 'Disabled'}")
+    print(f"  - ProMotion 120Hz: {'Yes' if device.promotion_display else 'No'}")
     print(f"  - Capabilities: {len(ios_agent.capabilities)}")
+    print(f"  - Supported Features: {len(device.supported_features)}")
     
     # 12. Persistent Memory Demo
     print("\n12. Persistent Memory...")
@@ -280,7 +284,7 @@ async def main():
     print(f"✓ Planned instruction: status={result2['status']}")
     
     # 14. Device Capabilities Demo
-    print("\n14. iOS Device Capabilities...")
+    print("\n14. iOS Device Capabilities (iPhone 17 Pro)...")
     
     cap_result = await ios_agent.use_capability("notification_management")
     print(f"✓ Notification management: {cap_result['capability']}")
@@ -290,6 +294,15 @@ async def main():
     
     cap_result3 = await ios_agent.use_capability("device_optimization")
     print(f"✓ Device optimization: {cap_result3['capability']}")
+    
+    cap_result4 = await ios_agent.use_capability("apple_intelligence")
+    print(f"✓ Apple Intelligence: {cap_result4['capability']}")
+    
+    cap_result5 = await ios_agent.use_capability("camera_control")
+    print(f"✓ Camera Control: {cap_result5['capability']}")
+    
+    cap_result6 = await ios_agent.use_capability("action_button_config")
+    print(f"✓ Action Button: {cap_result6['capability']}")
     
     # 15. iOS Agent Status
     print("\n15. iOS Agent Status:")
