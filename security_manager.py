@@ -274,8 +274,10 @@ class SecurityManager:
                 issues.append("Sensitive data should be encrypted")
         
         # Check retention period (GDPR requires reasonable retention)
-        if asset.retention_days > 2555:  # ~7 years
-            issues.append("Retention period may be too long for GDPR")
+        # Default max is 7 years, but this should be configured based on data type
+        max_retention_days = 2555  # ~7 years - configurable threshold
+        if asset.retention_days > max_retention_days:
+            issues.append(f"Retention period exceeds recommended maximum ({max_retention_days} days)")
         
         # Check if data has an owner (accountability)
         if not asset.owner:
