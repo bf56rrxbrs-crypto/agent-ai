@@ -201,6 +201,51 @@ class TestPersistentMemory(unittest.TestCase):
         self.assertIn("personal", summary["categories"])
         self.assertAlmostEqual(summary["average_importance"], 0.7, places=1)
 
+    def test_load_corrupted_json(self):
+        """Test loading from a corrupted JSON file recovers gracefully"""
+        with open(self.storage_path, "w") as f:
+            f.write("{invalid json!")
+
+        memory = PersistentMemory(storage_path=self.storage_path, max_memories=10)
+        self.assertEqual(len(memory.memories), 0)
+
+    def test_load_invalid_structure(self):
+        """Test loading a valid JSON file with invalid structure"""
+        with open(self.storage_path, "w") as f:
+            json.dump("not a dict", f)
+
+        memory = PersistentMemory(storage_path=self.storage_path, max_memories=10)
+        self.assertEqual(len(memory.memories), 0)
+
+    def test_load_corrupted_memory_entry(self):
+        """Test loading skips corrupted individual memory entries"""
+        data = {
+            "version": 1,
+            "memory_counter": 2,
+            "memories": {
+                "good-001": {
+                    "memory_id": "good-001",
+                    "category": "test",
+                    "content": "Good memory",
+                },
+                "bad-001": {
+                    "memory_id": "bad-001",
+                    # Missing required 'category' and 'content' fields
+                },
+            },
+        }
+        with open(self.storage_path, "w") as f:
+            json.dump(data, f)
+
+        memory = PersistentMemory(storage_path=self.storage_path, max_memories=10)
+        self.assertEqual(len(memory.memories), 1)
+        self.assertIn("good-001", memory.memories)
+
+    def test_from_dict_missing_fields(self):
+        """Test Memory.from_dict raises ValueError on missing fields"""
+        with self.assertRaises(ValueError):
+            Memory.from_dict({"memory_id": "test-only-id"})
+
 
 if __name__ == "__main__":
     unittest.main()

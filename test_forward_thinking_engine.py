@@ -290,6 +290,32 @@ class TestForwardThinkingEngine(unittest.TestCase):
         result = await self.engine.execute_plan(plan.plan_id)
         self.assertEqual(result["status"], "completed")
 
+    async def test_execute_empty_plan(self):
+        """Test executing a plan with no steps completes immediately"""
+        plan = self.engine.create_plan("Empty goal")
+        result = await self.engine.execute_plan(plan.plan_id)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["evaluation"]["total_steps"], 0)
+
+    async def test_step_error_includes_type(self):
+        """Test that step error includes exception type name"""
+        async def type_error_action(**kwargs):
+            raise TypeError("bad type")
+
+        plan = self.engine.create_plan("Error type goal")
+        self.engine.add_step(
+            plan_id=plan.plan_id,
+            name="Type Error Step",
+            description="Raises TypeError",
+            action=type_error_action,
+        )
+        plan.steps[0].max_retries = 0
+
+        result = await self.engine.execute_plan(plan.plan_id)
+        self.assertEqual(result["status"], "failed")
+        step_data = result["steps"][0]
+        self.assertIn("TypeError", step_data["error"])
+
 
 # Apply async_test decorator to async test methods
 TestForwardThinkingEngine.test_execute_plan_simple = async_test(
@@ -318,6 +344,12 @@ TestForwardThinkingEngine.test_no_action_step = async_test(
 )
 TestForwardThinkingEngine.test_sync_action = async_test(
     TestForwardThinkingEngine.test_sync_action
+)
+TestForwardThinkingEngine.test_execute_empty_plan = async_test(
+    TestForwardThinkingEngine.test_execute_empty_plan
+)
+TestForwardThinkingEngine.test_step_error_includes_type = async_test(
+    TestForwardThinkingEngine.test_step_error_includes_type
 )
 
 

@@ -362,6 +362,7 @@ class IOSAgent:
                 "status": "failed",
                 "instruction": instruction,
                 "error": str(e),
+                "error_type": type(e).__name__,
             }
 
     async def _execute_with_planning(
@@ -503,10 +504,12 @@ class IOSAgent:
             Capability execution result
         """
         if capability_name not in self.capabilities:
+            self.logger.error(f"Unknown capability requested: {capability_name}")
             raise ValueError(f"Unknown capability: {capability_name}")
 
         capability = self.capabilities[capability_name]
         if not capability.enabled:
+            self.logger.warning(f"Attempted to use disabled capability: {capability_name}")
             raise RuntimeError(f"Capability disabled: {capability_name}")
 
         result = await capability.execute(**params)

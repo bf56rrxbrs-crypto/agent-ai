@@ -240,6 +240,29 @@ class TestIOSAgent(unittest.TestCase):
 
         await self.agent.stop()
 
+    async def test_execute_instruction_failure_returns_error_type(self):
+        """Test that failed instructions include error_type in result"""
+        await self.agent.start()
+
+        # Monkey-patch _execute_core_action to force failure
+        original = self.agent._execute_core_action
+
+        async def failing_action(**kwargs):
+            raise TypeError("simulated type error")
+
+        self.agent._execute_core_action = failing_action
+
+        result = await self.agent.execute_instruction(
+            "Trigger failure", use_planning=False
+        )
+
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("error_type", result)
+        self.assertEqual(result["error_type"], "TypeError")
+
+        self.agent._execute_core_action = original
+        await self.agent.stop()
+
 
 # Apply async_test decorator to async test methods
 TestDeviceCapability.test_capability_execution = async_test(
@@ -270,6 +293,9 @@ TestIOSAgent.test_reliability_tracking = async_test(
 )
 TestIOSAgent.test_memory_persistence_across_instructions = async_test(
     TestIOSAgent.test_memory_persistence_across_instructions
+)
+TestIOSAgent.test_execute_instruction_failure_returns_error_type = async_test(
+    TestIOSAgent.test_execute_instruction_failure_returns_error_type
 )
 
 
